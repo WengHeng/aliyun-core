@@ -1,8 +1,8 @@
 <?php
 
-namespace aliyun\core;
+namespace Everstu\Aliyun;
 
-use aliyun\core\HttpRequest;
+use Everstu\Aliyun\HttpRequest;
 
 class Core
 {
