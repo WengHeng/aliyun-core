@@ -1,8 +1,7 @@
 <?php
 
-namespace Everstu\Aliyun;
+namespace everstu\aliyun;
 
-use Everstu\Aliyun\HttpRequest;
 
 class Core
 {
@@ -11,6 +10,11 @@ class Core
      * @var array
      */
     protected $QueryParam = [];
+    /**
+     * check params arr
+     * @var array
+     */
+    protected $checkParamArr = [];
     /**
      * query method
      * @var string
@@ -40,9 +44,23 @@ class Core
     /**
      * Core constructor.
      * @param array $config like this ['AccessKeyId'=>'阿里云AccessKeyId','AccessSecret'=>'阿里云AccessSecret']
+     * @throws \Exception
      */
     public function __construct($config)
     {
+        $require_config = ['AccessKeyId', 'AccessSecret'];//必要配置项
+        foreach ($require_config as $value)
+        {
+            if (array_key_exists($value, $config) == false)
+            {
+                throw new \Exception('必选配置项[' . $value . ']未传入');
+            }
+
+            if (empty($config[$value]) == true)
+            {
+                throw new \Exception('必选配置项[' . $value . ']为空');
+            }
+        }
         $this->AccessKeyId  = $config['AccessKeyId'];
         $this->AccessSecret = $config['AccessSecret'];
         $this->setQueryParam('SignatureMethod', 'HMAC-SHA1');
@@ -59,6 +77,7 @@ class Core
      */
     public function exec()
     {
+        $this->checkRequestParam();
         $httpTool = new HttpRequest();
         $method   = strtolower($this->QueryMethod);
         if (in_array($method, ['post', 'get']) == false)
@@ -81,6 +100,7 @@ class Core
     protected function setQueryParam($key, $param)
     {
         $this->QueryParam[$key] = $param;
+        $this->checkParamArr[]  = $key;
     }
 
     /**
@@ -101,8 +121,9 @@ class Core
     }
 
     /**
+     * 替换特殊字符
+     * @param string
      * @access protected
-     *  根据参数生成请求的签名
      */
     protected function percentEncode($str)
     {
@@ -123,5 +144,41 @@ class Core
     protected function buildSignature($source, $accessSecret)
     {
         $this->setQueryParam('Signature', base64_encode(hash_hmac('sha1', $source, $accessSecret, true)));
+    }
+
+    /**
+     * 设置校验参数数组
+     * @param $checkParamArr
+     * @return $this
+     */
+    protected function setCheckParamArr($checkParamArr)
+    {
+        foreach ($checkParamArr as $value)
+        {
+            $this->checkParamArr[] = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * 检查请求参数是否传入或是否为空
+     * @throws \Exception
+     */
+    protected function checkRequestParam()
+    {
+        $checkArr = array_unique($this->checkParamArr);
+        foreach ($checkArr as $value)
+        {
+            if (isset($this->QueryParam[$value]) == false)
+            {
+                throw new \Exception('请求参数[' . $value . ']未设置');
+            }
+
+            if (empty($this->QueryParam[$value]) == true)
+            {
+                throw new \Exception('请求参数[' . $value . ']为空');
+            }
+        }
     }
 }

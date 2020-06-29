@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Everstu\\Aliyun\\": "src/"
+            "everstu\\aliyun\\": "src/"
         }
     }
 }

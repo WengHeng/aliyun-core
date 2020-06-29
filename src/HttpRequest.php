@@ -1,5 +1,5 @@
 <?php
-namespace Everstu\Aliyun;
+namespace everstu\aliyun;
 
 class HttpRequest
 {
