@@ -99,6 +99,10 @@ class HttpRequest
      */
     public $requset_uri;
     /**
+     * @var array Request body data
+     */
+    public $request_data;
+    /**
      * Constructor ensures the available curl extension is loaded.
      *
      * @throws \ErrorException
@@ -176,6 +180,7 @@ class HttpRequest
      */
     protected function preparePayload($data)
     {
+        $this->request_data = $data;
         $this->setOpt(CURLOPT_POST, true);
         if (is_array($data) || is_object($data)) {
             $data = http_build_query($data);
