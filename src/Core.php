@@ -63,6 +63,15 @@ class Core
         }
         $this->AccessKeyId  = $config['AccessKeyId'];
         $this->AccessSecret = $config['AccessSecret'];
+        $this->init();
+    }
+
+    /**
+     * 初始化接口公共参数
+     */
+    public function init()
+    {
+        $this->QueryParam = [];//清除上次请求参数
         $this->setQueryParam('SignatureMethod', 'HMAC-SHA1');
         $this->setQueryParam('SignatureVersion', '1.0');
         $this->setQueryParam('SignatureNonce', uniqid(mt_rand(0, 0xffff), true));
@@ -180,5 +189,14 @@ class Core
                 throw new \Exception('请求参数[' . $value . ']为空');
             }
         }
+    }
+
+    /**
+     * 设置是否开启HTTPS请求接口
+     * @param bool $security true 开启 false 不开启 默认true 初始值false
+     */
+    protected function setIsHttps($security = true)
+    {
+        $this->security = $security;
     }
 }
