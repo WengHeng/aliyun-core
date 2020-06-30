@@ -11,6 +11,11 @@ class Core
      */
     protected $QueryParam = [];
     /**
+     * Last time query params
+     * @var array
+     */
+    protected $preQueryParam = [];
+    /**
      * check params arr
      * @var array
      */
@@ -71,7 +76,8 @@ class Core
      */
     public function init()
     {
-        $this->QueryParam = [];//清除上次请求参数
+        $this->preQueryParam = $this->QueryParam;//记录上次请求参数
+        $this->QueryParam    = [];//清除上次请求参数
         $this->setQueryParam('SignatureMethod', 'HMAC-SHA1');
         $this->setQueryParam('SignatureVersion', '1.0');
         $this->setQueryParam('SignatureNonce', uniqid(mt_rand(0, 0xffff), true));
@@ -86,16 +92,18 @@ class Core
      */
     public function exec()
     {
-        $this->checkRequestParam();
+        $this->checkRequestParam();//检验参数是否正确
         $httpTool = new HttpRequest();
         $method   = strtolower($this->QueryMethod);
-        if (in_array($method, ['post', 'get']) == false)
+        if (in_array($method, ['post', 'get']) == false)//判断是否在允许请求方法内
         {
             throw new \Exception('Method Not Allow,It\'s get|post');
         }
         $this->getSignature();//获取请求签名
         $queryUrl = ($this->security ? 'https://' : 'http://') . $this->baseApi;//生成请求URL
         $httpTool->$method($queryUrl, $this->QueryParam);
+
+        $this->init();//请求完毕自动初始化请求参数
 
         return $httpTool;
     }
