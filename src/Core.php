@@ -109,15 +109,18 @@ class Core
     }
 
     /**
+     *  绑定请求的参数 可以设置可选请求参数 可以链式调用
      * @param string|integer $key 请求参数的键
      * @param string $param 请求参数的值
-     * @access protected
-     *  绑定请求的参数
+     * @return  $this
+     * @access public
      */
-    protected function setQueryParam($key, $param)
+    public function setQueryParam($key, $param)
     {
         $this->QueryParam[$key] = $param;
         $this->checkParamArr[]  = $key;
+
+        return $this;
     }
 
     /**
